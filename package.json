@@ -1,0 +1,50 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "polygon:dev": "templateId=1 content=polygon NODE_ENV=development webpack --watch --env=dev --progress --config ./build/webpack.config.js",
+    "polygon:prod": "templateId=1 content=polygon NODE_ENV=production webpack --env=prod --progress --config ./build/webpack.config.js",
+    "dev": "npm run polygon:dev",
+    "prod": "npm run polygon:prod"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "babel-polyfill": "^6.26.0",
+    "element-ui": "^2.4.11",
+    "vue": "^2.5.17",
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-proposal-export-default-from": "^7.0.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
+    "@babel/preset-env": "^7.1.0",
+    "babel-loader": "^8.0.4",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "clean-webpack-plugin": "^0.1.19",
+    "css-loader": "^1.0.0",
+    "file-loader": "^2.0.0",
+    "friendly-errors-webpack-plugin": "^1.7.0",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
+    "less": "~3.9.0",
+    "less-loader": "^4.1.0",
+    "mini-css-extract-plugin": "^0.7.0",
+    "style-loader": "^0.23.0",
+    "url-loader": "^1.1.1",
+    "vue-loader": "^15.4.2",
+    "vue-template-compiler": "^2.5.17",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.9",
+    "webpack-merge": "^4.1.4"
+  },
+  "browserslist": [
+    "last 1 version",
+    "> 1%",
+    "ie 10",
+    "not dead"
+  ]
+}
