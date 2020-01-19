@@ -1,7 +1,7 @@
 <template>
   <div class='map-container'>
     <div id='map'></div>
-    <popup v-show="formFlag" @submit="popupSubmit" @cancel="popupCancel"></popup>
+    <popup v-show='formFlag' @submit='popupSubmit' @cancel='popupCancel'></popup>
   </div>
 </template>
 
@@ -10,6 +10,7 @@ import mk from "@Lib/mk";
 import popup from "./popup";
 import MapUtil from "@Utils/map/mapUtil";
 import result from "../../../data";
+import { getUid, setUid } from "@Utils/map/idCounter";
 import { findDeepPolygon, paintPolygon } from "@Utils/map/polygonUtil";
 let mapManager = {
   map: null,
@@ -24,14 +25,24 @@ let mapManager = {
   drawingFeature: null,
   fullExtentResolution: null
 };
+let FORMSTATUS = {
+  DRAW: 1,
+  MODIFY: 2,
+  HIDE: 3
+};
+let color = {
+  r: 255,
+  g: 0,
+  b: 0
+};
 export default {
   components: {
-    popup,
+    popup
   },
   props: {},
   data() {
     return {
-      formFlag: false,
+      formFlag: false
     };
   },
   watch: {},
@@ -124,6 +135,20 @@ export default {
         return;
       }
       flayer.addFeatures(features);
+      let maxId = -100;
+      features.forEach(f => {
+        const formData = f.get("formData");
+        if (formData) {
+          const id = formData.id;
+          maxId = Math.max(maxId, id);
+        }
+      });
+
+      if (maxId > 0) {
+        setUid(maxId + 1);
+      } else {
+        setUid(0);
+      }
     },
     /**
      * 初始化多边形绘制工具
@@ -229,14 +254,70 @@ export default {
       const overlay = mapManager.overlay;
       const geometry = feature.geometry;
       mapManager.drawingFeature = feature;
-      overlay.position = geometry.getFormShowPosition()
-      this.formFlag = true;
+      overlay.position = geometry.getFormShowPosition();
+      this.changeFormStatus(FORMSTATUS.DRAW);
     },
-    popupSubmit(val){
-      console.log(val)
+    changeFormStatus(status) {
+      if (status === FORMSTATUS.DRAW) {
+        //清空表单
+        this.formFlag = true;
+      } else if (status === FORMSTATUS.MODIFY) {
+        //回填表单
+        this.formFlag = true;
+      } else if (status === FORMSTATUS.HIDE) {
+        this.formFlag = false;
+      }
     },
-    popupCancel(){
-      console.log('取消')
+    popupSubmit(val) {
+      //设置表单
+      this.setGeometryForm(val);
+      this.changeFormStatus(FORMSTATUS.HIDE);
+    },
+    setGeometryForm(data) {
+      let obj = {};
+      let currentFeature = mapManager.drawingFeature;
+      if (currentFeature == null) {
+        currentFeature = mapManager.currentFeature;
+      }
+
+      if (MapUtil.isNewFeature(currentFeature)) {
+        obj.id = getUid();
+      } else {
+        obj.id = currentFeature.get("formData").id;
+      }
+      obj.value = data;
+      let str = "";
+      str += "-" + data;
+      currentFeature.displayText = obj.id + str;
+      currentFeature.set("formData", data);
+
+      if (color != null && mapManager.drawingFeature != null) {
+        currentFeature.set("fcolor", [color.r, color.g, color.b]);
+        paintPolygon(currentFeature, this.color);
+      }
+
+      mapManager.drawingFeature = null;
+    },
+    setFormCancel() {
+      let currentFeature = mapManager.currentFeature;
+      if (currentFeature == null) {
+        currentFeature = mapManager.drawingFeature;
+      }
+
+      // 新绘制图形，则点击取消时，则删除绘制
+      if (MapUtil.isNewFeature(currentFeature)) {
+        mapManager.flayer.removeFeature(currentFeature);
+        mapManager.currentFeature = null;
+      } else {
+        mapManager.selectTool.clear();
+        mapManager.modifyTool.active = false;
+        mapManager.currentFeature = null;
+      }
+    },
+    popupCancel() {
+      //删除图形
+      this.setFormCancel();
+      this.changeFormStatus(FORMSTATUS.HIDE);
     }
   },
   created() {},

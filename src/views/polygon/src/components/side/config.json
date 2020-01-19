@@ -1,0 +1,18 @@
+{  
+  "tools": [
+    {
+      "index": "default",
+      "title": "选择(S)",
+      "icon": "icon-default.png",
+      "keyCode": 83,
+      "imgurl": null
+    },
+    {
+      "index": "new",
+      "title": "新建(F)",
+      "icon": "icon-new-polygon.png",
+      "keyCode": 70,
+      "imgurl": null
+    }
+  ]
+}
