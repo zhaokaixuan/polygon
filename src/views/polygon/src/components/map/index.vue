@@ -14,6 +14,7 @@ import { getUid, setUid } from "@Utils/map/idCounter";
 import { findDeepPolygon, paintPolygon } from "@Utils/map/polygonUtil";
 import bus from "@Lib/bus";
 import { cutPolygon } from '@Utils/map/cutPolygon'
+import { cutHoles } from '@Utils/map/holesPolygon'
 
 
 let mapManager = {
@@ -262,13 +263,20 @@ export default {
       if (feature == undefined) {
         return;
       }
-      const overlay = mapManager.overlay;
-      const geometry = feature.geometry;
+      let coedge = false;
+      let cutOut = false;
       mapManager.drawingFeature = feature;
       // 共边切割
-      this.cutGeometry(feature);
-      overlay.position = geometry.getFormShowPosition();
-      this.changeFormStatus(FORMSTATUS.DRAW);
+      if (this.coedgeStatus === true) {
+        coedge = this.cutGeometry(feature);
+      }
+      if( this.cutOutStatus === true) {
+        cutOut = this.cutHoles(feature);
+      }
+      if(coedge && cutOut){
+        mapManager.overlay.position = feature.geometry.getFormShowPosition();
+        this.changeFormStatus(FORMSTATUS.DRAW);
+      }  
     },
     changeFormStatus(status, feature) {
       if (status === FORMSTATUS.DRAW) {
@@ -352,20 +360,34 @@ export default {
       });
     },
     cutGeometry(feature) {
-      if (this.coedgeStatus === false) {
-        return;
-      }
+      
 
       const flayer = mapManager.flayer;
       const cutedFeatures = cutPolygon(feature, flayer.features);
       if (cutedFeatures.length === 0) {
-        return;
+        return true;
       }
 
       flayer.addFeatures(cutedFeatures);
       flayer.removeFeature(feature);
 
       mapManager.drawingFeature = cutedFeatures[0];
+      mapManager.overlay.position = feature.geometry.getFormShowPosition();
+      this.changeFormStatus(FORMSTATUS.DRAW);
+      return false;
+      
+    },
+    cutHoles(feature){
+     
+      const flayer = mapManager.flayer;
+      const holesFeature = cutHoles(feature,flayer);
+      if(holesFeature.length === 0) {
+        return true;
+      }
+      flayer.addFeatures(holesFeature);
+      flayer.removeFeature(feature);
+      mapManager.drawingFeature = holesFeature[0];
+      return false;
     },
     submit() {
       let res = this.getMarkResult();
