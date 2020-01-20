@@ -1,7 +1,7 @@
 <template>
   <div class='map-container'>
-    <div id='map' @contextmenu.prevent="onMapClick($event)"></div>
-    <popup v-show='formFlag' @submit='popupSubmit' @cancel='popupCancel' :value="formValue"></popup>
+    <div id='map' @contextmenu.prevent='onMapClick($event)'></div>
+    <popup v-show='formFlag' @submit='popupSubmit' @cancel='popupCancel' :value='formValue'></popup>
   </div>
 </template>
 
@@ -45,13 +45,13 @@ export default {
   data() {
     return {
       formFlag: false,
-      formValue:''
+      formValue: ""
     };
   },
   watch: {},
   computed: {},
   methods: {
-    onMapClick(){},
+    onMapClick() {},
     init() {
       const self = this;
       let data = result;
@@ -248,7 +248,7 @@ export default {
       mapManager.modifyTool.active = true;
       mapManager.currentFeature = feature;
       if (button === 2) {
-        this.changeFormStatus(FORMSTATUS.MODIFY,feature)
+        this.changeFormStatus(FORMSTATUS.MODIFY, feature);
       }
     },
     /**
@@ -266,16 +266,16 @@ export default {
       overlay.position = geometry.getFormShowPosition();
       this.changeFormStatus(FORMSTATUS.DRAW);
     },
-    changeFormStatus(status,feature) {
+    changeFormStatus(status, feature) {
       if (status === FORMSTATUS.DRAW) {
         //清空表单
-        this.formValue = ''
+        this.formValue = "";
         this.formFlag = true;
       } else if (status === FORMSTATUS.MODIFY) {
         //回填表单
-        console.log(feature)
-        console.log(feature.get('formData'))
-        this.formValue = feature.get('formData').value;
+        console.log(feature);
+        console.log(feature.get("formData"));
+        this.formValue = feature.get("formData").value;
         this.formFlag = true;
       } else if (status === FORMSTATUS.HIDE) {
         this.formFlag = false;
@@ -346,6 +346,18 @@ export default {
           f.styleHighLight = false;
         }
       });
+    },
+    submit(){
+      let res = this.getMarkResult();
+      console.log(res)
+    },
+    getMarkResult() {
+      const features = mapManager.flayer.features;
+      if (features.length) {
+        return mk.GeoJSON.write(features);
+      } else {
+        return "";
+      }
     }
   },
   created() {},

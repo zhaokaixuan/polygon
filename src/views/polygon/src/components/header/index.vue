@@ -1,10 +1,11 @@
 <template>
 <div class="header-container">
-
+  <el-button class="btn" type="success" @click="submit">提交</el-button>
 </div>
 </template>
 
 <script>
+import bus from "@Lib/bus"
 export default {
   components: {},
   props: {},
@@ -14,7 +15,11 @@ export default {
   },
   watch: {},
   computed: {},
-  methods: {},
+  methods: {
+    submit(){
+      bus.$emit("submit");
+    }
+  },
   created() {},
   mounted() {}
 };

@@ -39,6 +39,10 @@ export default {
         {
           event: 'drawBtn',
           fun: this.drawBtn
+        },
+        {
+          event: 'submit',
+          fun: this.submit
         }
       ],
     };
@@ -52,6 +56,9 @@ export default {
     },
     drawBtn(){
       this.$refs.map.drawBtn();
+    },
+    submit(){
+      this.$refs.map.submit();
     }
   },
   created() {},
