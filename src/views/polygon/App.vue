@@ -18,7 +18,9 @@ html,body,#app{
 
 <script>
 import index from './src/index';
+import { baseMixin } from "@Lib/bus/baseMixin";
 export default {
+	mixins: [baseMixin],
 	components: {
 		index
 	},

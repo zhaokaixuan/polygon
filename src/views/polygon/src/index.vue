@@ -8,7 +8,7 @@
       <side-comp></side-comp>
     </div>
     <div class="map">
-      <map-comp></map-comp>
+      <map-comp ref="map"></map-comp>
     </div>
   </div>
 </div>
@@ -18,7 +18,11 @@
 import headerComp from './components/header';
 import mapComp from './components/map';
 import sideComp from './components/side';
+import bus from "@Lib/bus"
+import { baseMixin } from "@Lib/bus/baseMixin";
+
 export default {
+  mixins: [baseMixin],
   components: {
     headerComp,
     sideComp,
@@ -27,11 +31,29 @@ export default {
   props: {},
   data() {
     return {
+      eventList: [
+        {
+          event: "selectBtn",
+          fun: this.selectBtn
+        },
+        {
+          event: 'drawBtn',
+          fun: this.drawBtn
+        }
+      ],
     };
   },
   watch: {},
   computed: {},
-  methods: {},
+  methods: {
+    selectBtn(){
+      console.log('selectbtn')
+      this.$refs.map.selectBtn();
+    },
+    drawBtn(){
+      this.$refs.map.drawBtn();
+    }
+  },
   created() {},
   mounted() {}
 };

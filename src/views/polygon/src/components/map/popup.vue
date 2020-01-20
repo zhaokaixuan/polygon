@@ -18,14 +18,20 @@
 <script>
 export default {
   components: {},
-  props: {},
+  props: {
+    value:''
+  },
   data() {
     return {
       radioConfig: [{ label: "车" }, { label: "树" }, { label: "人" }],
-      form:{radio:'车'}
+      form:{radio:''}
     };
   },
-  watch: {},
+  watch: {
+    value(val){
+      this.form.radio =val;
+    }
+  },
   computed: {},
   methods: {
     onSubmit(){

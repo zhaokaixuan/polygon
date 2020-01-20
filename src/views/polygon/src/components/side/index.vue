@@ -1,11 +1,14 @@
 <template>
   <div class='side-container'>
-     <el-button class="btn" type="success" round v-for='(item, index) in config.tools' :key='index'>{{item.title}}</el-button>
+     <el-button class="btn" type="success" @click="selectBtn">选择</el-button>
+     <el-button class="btn" type="success" @click="drawBtn">绘制</el-button>
   </div>
 </template>
 
 <script>
 import config from './config.json'
+import bus from "@Lib/bus"
+
 export default {
   components: {},
   props: {},
@@ -16,7 +19,14 @@ export default {
   },
   watch: {},
   computed: {},
-  methods: {},
+  methods: {
+    selectBtn(){
+      bus.$emit("selectBtn");
+    },
+    drawBtn(){
+      bus.$emit('drawBtn');
+    }
+  },
   created() {},
   mounted() {}
 };

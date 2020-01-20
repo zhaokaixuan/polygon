@@ -1,7 +1,7 @@
 <template>
   <div class='map-container'>
-    <div id='map'></div>
-    <popup v-show='formFlag' @submit='popupSubmit' @cancel='popupCancel'></popup>
+    <div id='map' @contextmenu.prevent="onMapClick($event)"></div>
+    <popup v-show='formFlag' @submit='popupSubmit' @cancel='popupCancel' :value="formValue"></popup>
   </div>
 </template>
 
@@ -12,6 +12,8 @@ import MapUtil from "@Utils/map/mapUtil";
 import result from "../../../data";
 import { getUid, setUid } from "@Utils/map/idCounter";
 import { findDeepPolygon, paintPolygon } from "@Utils/map/polygonUtil";
+import bus from "@Lib/bus";
+
 let mapManager = {
   map: null,
   flayer: null,
@@ -42,12 +44,14 @@ export default {
   props: {},
   data() {
     return {
-      formFlag: false
+      formFlag: false,
+      formValue:''
     };
   },
   watch: {},
   computed: {},
   methods: {
+    onMapClick(){},
     init() {
       const self = this;
       let data = result;
@@ -206,7 +210,8 @@ export default {
               feature = selectedFeatures[0];
             }
           }
-          this.selectFeature(feature);
+          const button = evt.browserEvent.originalEvent.button;
+          this.selectFeature(feature, button);
         } else {
           mapManager.modifyTool.active = false;
           mapManager.currentFeature = null;
@@ -241,6 +246,9 @@ export default {
       mapManager.modifyTool.features = [feature];
       mapManager.modifyTool.active = true;
       mapManager.currentFeature = feature;
+      if (button === 2) {
+        this.changeFormStatus(FORMSTATUS.MODIFY,feature)
+      }
     },
     /**
      * 图形绘制完毕处理方法
@@ -257,12 +265,16 @@ export default {
       overlay.position = geometry.getFormShowPosition();
       this.changeFormStatus(FORMSTATUS.DRAW);
     },
-    changeFormStatus(status) {
+    changeFormStatus(status,feature) {
       if (status === FORMSTATUS.DRAW) {
         //清空表单
+        this.formValue = ''
         this.formFlag = true;
       } else if (status === FORMSTATUS.MODIFY) {
         //回填表单
+        console.log(feature)
+        console.log(feature.get('formData'))
+        this.formValue = feature.get('formData').value;
         this.formFlag = true;
       } else if (status === FORMSTATUS.HIDE) {
         this.formFlag = false;
@@ -289,7 +301,7 @@ export default {
       let str = "";
       str += "-" + data;
       currentFeature.displayText = obj.id + str;
-      currentFeature.set("formData", data);
+      currentFeature.set("formData", obj);
 
       if (color != null && mapManager.drawingFeature != null) {
         currentFeature.set("fcolor", [color.r, color.g, color.b]);
@@ -318,6 +330,21 @@ export default {
       //删除图形
       this.setFormCancel();
       this.changeFormStatus(FORMSTATUS.HIDE);
+    },
+    selectBtn() {
+      mapManager.drawTool.active = false;
+      mapManager.selectTool.active = true;
+    },
+    drawBtn() {
+      console.log("drawbtn");
+      mapManager.drawTool.active = true;
+      mapManager.selectTool.active = false;
+      mapManager.modifyTool.active = false;
+      mapManager.flayer.features.forEach(f => {
+        if (f.styleHighLight) {
+          f.styleHighLight = false;
+        }
+      });
     }
   },
   created() {},
