@@ -8,7 +8,7 @@
       <side-comp></side-comp>
     </div>
     <div class="map">
-      <map-comp ref="map"></map-comp>
+      <map-comp ref="map" :coedgeStatus="coedgeStatus" :cutOutStatus="cutOutStatus" :cutSaveStatus="cutSaveStatus"></map-comp>
     </div>
   </div>
 </div>
@@ -43,12 +43,30 @@ export default {
         {
           event: 'submit',
           fun: this.submit
+        },
+        {
+          event: 'getCoedgeStatus',
+          fun: this.getCoedgeStatus
+        },
+        {
+          event: 'getCutOutStatus',
+          fun: this.getCutOutStatus
+        },
+        {
+          event: 'getCutSaveStatus',
+          fun: this.getCutSaveStatus
         }
       ],
+      coedgeStatus:false,
+      cutOutStatus:false,
+      cutSaveStatus:false
+
     };
   },
   watch: {},
-  computed: {},
+  computed: {
+    
+  },
   methods: {
     selectBtn(){
       console.log('selectbtn')
@@ -59,6 +77,15 @@ export default {
     },
     submit(){
       this.$refs.map.submit();
+    },
+    getCoedgeStatus(status){
+      this.coedgeStatus = status;
+    },
+    getCutOutStatus(status){
+      this.cutOutStatus = status;
+    },
+    getCutSaveStatus(status){
+      this.cutSaveStatus = status;
     }
   },
   created() {},

@@ -13,6 +13,8 @@ import result from "../../../data";
 import { getUid, setUid } from "@Utils/map/idCounter";
 import { findDeepPolygon, paintPolygon } from "@Utils/map/polygonUtil";
 import bus from "@Lib/bus";
+import { cutPolygon } from '@Utils/map/cutPolygon'
+
 
 let mapManager = {
   map: null,
@@ -41,11 +43,11 @@ export default {
   components: {
     popup
   },
-  props: {},
+  props: ['coedgeStatus','cutOutStatus','cutSaveStatus'],
   data() {
     return {
       formFlag: false,
-      formValue: ""
+      formValue: "",
     };
   },
   watch: {},
@@ -263,6 +265,8 @@ export default {
       const overlay = mapManager.overlay;
       const geometry = feature.geometry;
       mapManager.drawingFeature = feature;
+      // 共边切割
+      this.cutGeometry(feature);
       overlay.position = geometry.getFormShowPosition();
       this.changeFormStatus(FORMSTATUS.DRAW);
     },
@@ -347,9 +351,25 @@ export default {
         }
       });
     },
-    submit(){
+    cutGeometry(feature) {
+      if (this.coedgeStatus === false) {
+        return;
+      }
+
+      const flayer = mapManager.flayer;
+      const cutedFeatures = cutPolygon(feature, flayer.features);
+      if (cutedFeatures.length === 0) {
+        return;
+      }
+
+      flayer.addFeatures(cutedFeatures);
+      flayer.removeFeature(feature);
+
+      mapManager.drawingFeature = cutedFeatures[0];
+    },
+    submit() {
       let res = this.getMarkResult();
-      console.log(res)
+      console.log(res);
     },
     getMarkResult() {
       const features = mapManager.flayer.features;
