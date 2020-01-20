@@ -28,7 +28,8 @@ export default {
     }
   },
   created() {},
-  mounted() {}
+  mounted() {
+  }
 };
 </script>
 <style scoped lang="less">

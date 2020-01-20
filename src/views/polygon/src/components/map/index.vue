@@ -109,6 +109,7 @@ export default {
       this.setupDrawTool(map, flayer);
       this.setupSelectTool(map);
       this.setupModifyTool(map);
+      this.selectBtn();
     },
     getImgObj(url) {
       return new Promise((resolve, reject) => {
