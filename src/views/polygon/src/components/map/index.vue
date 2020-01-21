@@ -168,7 +168,7 @@ export default {
         type: "polygon",
         drawLayer: flayer,
         finishCondition: evt => event.keyCode === 13,
-        undoCondition: evt => false
+        undoCondition: evt => event.keyCode === 27
       });
       map.addComponents(drawTool);
 
