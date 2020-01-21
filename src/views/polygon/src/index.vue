@@ -41,6 +41,10 @@ export default {
           fun: this.drawBtn
         },
         {
+          event: 'deleteBtn',
+          fun: this.deleteBtn
+        },
+        {
           event: 'submit',
           fun: this.submit
         },
@@ -74,6 +78,9 @@ export default {
     },
     drawBtn(){
       this.$refs.map.drawBtn();
+    },
+    deleteBtn() {
+      this.$refs.map.deleteBtn();
     },
     submit(){
       this.$refs.map.submit();

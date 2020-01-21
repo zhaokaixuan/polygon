@@ -13,9 +13,8 @@ import result from "../../../data";
 import { getUid, setUid } from "@Utils/map/idCounter";
 import { findDeepPolygon, paintPolygon } from "@Utils/map/polygonUtil";
 import bus from "@Lib/bus";
-import { cutPolygon } from '@Utils/map/cutPolygon'
-import { cutHoles } from '@Utils/map/holesPolygon'
-
+import { cutPolygon } from "@Utils/map/cutPolygon";
+import { cutHoles } from "@Utils/map/holesPolygon";
 
 let mapManager = {
   map: null,
@@ -44,11 +43,11 @@ export default {
   components: {
     popup
   },
-  props: ['coedgeStatus','cutOutStatus','cutSaveStatus'],
+  props: ["coedgeStatus", "cutOutStatus", "cutSaveStatus"],
   data() {
     return {
       formFlag: false,
-      formValue: "",
+      formValue: ""
     };
   },
   watch: {},
@@ -263,20 +262,20 @@ export default {
       if (feature == undefined) {
         return;
       }
-      let coedge = false;
-      let cutOut = false;
+      let coedge = true;
+      let cutOut = true;
       mapManager.drawingFeature = feature;
       // 共边切割
       if (this.coedgeStatus === true) {
         coedge = this.cutGeometry(feature);
       }
-      if( this.cutOutStatus === true) {
+      if (this.cutOutStatus === true) {
         cutOut = this.cutHoles(feature);
       }
-      if(coedge && cutOut){
+      if (coedge && cutOut) {
         mapManager.overlay.position = feature.geometry.getFormShowPosition();
         this.changeFormStatus(FORMSTATUS.DRAW);
-      }  
+      }
     },
     changeFormStatus(status, feature) {
       if (status === FORMSTATUS.DRAW) {
@@ -349,7 +348,6 @@ export default {
       mapManager.selectTool.active = true;
     },
     drawBtn() {
-      console.log("drawbtn");
       mapManager.drawTool.active = true;
       mapManager.selectTool.active = false;
       mapManager.modifyTool.active = false;
@@ -359,9 +357,24 @@ export default {
         }
       });
     },
-    cutGeometry(feature) {
-      
+    deleteBtn() {
+      const currentFeature = mapManager.currentFeature;
 
+      if (currentFeature == null) {
+        this.$message.info("请选择一个图形删除！");
+        return;
+      }
+      const selectedFeatures = [currentFeature];
+      selectedFeatures.forEach(feature => {
+        mapManager.flayer.removeFeature(feature);
+        mapManager.modifyTool.active = false;
+        mapManager.selectTool._selectLayer.removeFeature(feature);
+        if (feature.id === currentFeature.id) {
+          mapManager.currentFeature = null;
+        }
+      });
+    },
+    cutGeometry(feature) {
       const flayer = mapManager.flayer;
       const cutedFeatures = cutPolygon(feature, flayer.features);
       if (cutedFeatures.length === 0) {
@@ -375,13 +388,11 @@ export default {
       mapManager.overlay.position = feature.geometry.getFormShowPosition();
       this.changeFormStatus(FORMSTATUS.DRAW);
       return false;
-      
     },
-    cutHoles(feature){
-     
+    cutHoles(feature) {
       const flayer = mapManager.flayer;
-      const holesFeature = cutHoles(feature,flayer);
-      if(holesFeature.length === 0) {
+      const holesFeature = cutHoles(feature, flayer);
+      if (holesFeature.length === 0) {
         return true;
       }
       flayer.addFeatures(holesFeature);

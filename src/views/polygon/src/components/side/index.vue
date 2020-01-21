@@ -3,6 +3,7 @@
     <div class="btn-container">
       <el-button class="btn" type="success" @click="selectBtn">选择</el-button>
       <el-button class="btn" type="success" @click="drawBtn">绘制</el-button>
+      <el-button class="btn" type="success" @click="deleteBtn">删除</el-button>
     </div>
     <div class="btn-container">
       <el-checkbox v-model="coedgeStatus">共边</el-checkbox>
@@ -45,6 +46,9 @@ export default {
     },
     drawBtn(){
       bus.$emit('drawBtn');
+    },
+    deleteBtn(){
+      bus.$emit('deleteBtn')
     }
   },
   created() {},
