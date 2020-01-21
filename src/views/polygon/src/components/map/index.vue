@@ -264,15 +264,19 @@ export default {
       }
       let coedge = true;
       let cutOut = true;
+      let cutSave = true;
       mapManager.drawingFeature = feature;
       // 共边切割
       if (this.coedgeStatus === true) {
         coedge = this.cutGeometry(feature);
       }
-      if (this.cutOutStatus === true) {
+      if (this.cutOutStatus === true && this.cutSaveStatus === false) {
         cutOut = this.cutHoles(feature);
       }
-      if (coedge && cutOut) {
+      if (this.cutSaveStatus === true) {
+        cutSave = this.cutSaveHoles(feature);
+      }
+      if (coedge && cutOut && cutSave) {
         mapManager.overlay.position = feature.geometry.getFormShowPosition();
         this.changeFormStatus(FORMSTATUS.DRAW);
       }
@@ -398,6 +402,18 @@ export default {
       flayer.addFeatures(holesFeature);
       flayer.removeFeature(feature);
       mapManager.drawingFeature = holesFeature[0];
+      return false;
+    },
+    cutSaveHoles(feature) {
+      const flayer = mapManager.flayer;
+      const holesFeature = cutHoles(feature, flayer);
+      if (holesFeature.length === 0) {
+        return true;
+      }
+      flayer.addFeatures(holesFeature);
+      mapManager.drawingFeature = feature;
+      mapManager.overlay.position = feature.geometry.getFormShowPosition();
+      this.changeFormStatus(FORMSTATUS.DRAW);
       return false;
     },
     submit() {
